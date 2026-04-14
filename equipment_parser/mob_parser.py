@@ -99,15 +99,15 @@ def parse_mob_file(filename):
                 parts = line.split()
                 # Example: 178250 0 0 0 33554468 12480 0 0 -100 S
                 # action, agg, agg2, aff1, aff2, aff3, aff4 flags, align
-                current['action_flags'] = decode_mob_action_flags(int(parts[0]))
-                current['agg_flags'] = decode_mob_aggro_flags(int(parts[1])) or "None"
-                current['agg2_flags'] = decode_mob_aggro2_flags(int(parts[2])) or "None"
-                current['agg3_flags'] = decode_mob_aggro3_flags(int(parts[3])) or "None"
-                current['affect1_flags'] = decode_aff1_flags(int(parts[4])) or "None"
-                current['affect2_flags'] = decode_aff2_flags(int(parts[5])) or "None"
-                current['affect3_flags'] = decode_aff3_flags(int(parts[6])) or "None"
-                current['affect4_flags'] = decode_aff4_flags(int(parts[7])) or "None"
-                #current['affect5_flags'] = decode_aff1_flags(int(parts[8]))      
+                current['action_flags'] = decode_flags(int(parts[0]), MOB_ACTION_FLAGS) or "None"
+                current['agg_flags'] = decode_flags(int(parts[1]), MOB_AGGRO_FLAGS) or "None"
+                current['agg2_flags'] = decode_flags(int(parts[2]), MOB_AGGRO2_FLAGS) or "None"
+                current['agg3_flags'] = decode_flags(int(parts[3]), MOB_AGGRO3_FLAGS) or "None"
+                current['affect1_flags'] = decode_flags(int(parts[4]), ITEM_AFF1_FLAGS) or "None"
+                current['affect2_flags'] = decode_flags(int(parts[5]), ITEM_AFF2_FLAGS) or "None"
+                current['affect3_flags'] = decode_flags(int(parts[6]), ITEM_AFF3_FLAGS) or "None"
+                current['affect4_flags'] = decode_flags(int(parts[7]), ITEM_AFF4_FLAGS) or "None"
+                #current['affect5_flags'] = decode_flags(int(parts[8]), ITEM_AFF5_FLAGS)      
                 current['alignment'] = int(parts[8])
                 stage = 'stats2'
                 continue

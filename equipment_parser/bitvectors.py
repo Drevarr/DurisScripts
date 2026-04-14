@@ -318,7 +318,7 @@ AFF5_FLAGS = [
     "AFF5_JUDICIUM_FIDEI",      
 ]
 
-ITEM_EXTRA_FLAGS = [
+EXTRA_FLAGS = [
     "ITEM_GLOW",            
     "ITEM_NOSHOW",          
     "ITEM_BURIED",          
@@ -353,7 +353,7 @@ ITEM_EXTRA_FLAGS = [
     "ITEM_ENCRUSTED",       
 ]
 
-ITEM_EXTRA2_FLAGS = [
+EXTRA2_FLAGS = [
     "ITEM2_SILVER",        
     "ITEM2_BLESS",         
     "ITEM2_SLAY_GOOD",     
@@ -373,7 +373,7 @@ ITEM_EXTRA2_FLAGS = [
     "ITEM2_TRANSPARENT",   
 ]
 
-ITEM_WEAR_FLAGS = [
+WEAR_FLAGS = [
     "ITEM_NONE",            
     "ITEM_TAKE",            
     "ITEM_WEAR_FINGER",     
@@ -499,6 +499,21 @@ TOTEM_SPHERE_FLAGS = [
     for i, name in enumerate(TOTEM_SPHERES)
 ]
 
+ITEM_WEAR_FLAGS = [
+    (name, BIT(i + 1))
+    for i, name in enumerate(WEAR_FLAGS)
+]
+
+ITEM_EXTRA1_FLAGS = [
+    (name, BIT(i + 1))
+    for i, name in enumerate(EXTRA_FLAGS)
+]
+
+ITEM_EXTRA2_FLAGS = [
+    (name, BIT(i + 1))
+    for i, name in enumerate(EXTRA2_FLAGS)
+]
+
 ITEM_CLASS_ANTI_FLAGS = [
     (name, BIT(i + 1))
     for i, name in enumerate(CLASS_NAMES)
@@ -558,3 +573,14 @@ ITEM_AFF5_FLAGS = {
 def decode_bit_flags(mask: int, table: list[tuple[str, int]]) -> list[str]:
 
     return [name for name, bit in table if mask & bit]
+
+def decode_flags(mask: int, flag_map: dict[str, int], skip_zero: bool = False) -> list[str]:
+    result = []
+
+    for name, bit in flag_map.items():
+        if skip_zero and bit == 0:
+            continue
+        if mask & bit:
+            result.append(name)
+
+    return result

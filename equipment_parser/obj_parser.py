@@ -225,7 +225,7 @@ def process_item_values(item_values, item_type):
             }
                 
         case "ITEM_TOTEM":
-            spheres = ', '.join(decode_totem_sphere_flags(item_values[0]))
+            spheres = ', '.join(decode_flags(item_values[0], TOTEM_SPHERE_FLAGS))
             Item_Type_Notes = {
                 "Spheres": spheres
             }
@@ -375,21 +375,21 @@ def parse_obj_file(path):
                 "space": space,
                 "craftsmanship": craftmanship_lookup[craftsmanship],
                 "damage_resist": dmg_resist,
-                "wear_flags": decode_wear_flags(wear_flags),
-                "extra1_flags": decode_extra_flags(extra1_flags),
-                "extra2_flags": decode_extra2_flags(extra2_flags),
-                "anti1_flags": decode_class_anti_flags(anti1_flags),
-                "anti2_flags": decode_race_anti_flags(anti2_flags),
+                "wear_flags": decode_flags(wear_flags, ITEM_WEAR_FLAGS),
+                "extra1_flags": decode_flags(extra1_flags, ITEM_EXTRA1_FLAGS),
+                "extra2_flags": decode_flags(extra2_flags, ITEM_EXTRA2_FLAGS),
+                "anti1_flags": decode_flags(anti1_flags, ITEM_CLASS_ANTI_FLAGS),
+                "anti2_flags": decode_flags(anti2_flags, ITEM_ANTI2_FLAGS),
                 "item_values": item_vals,
                 "item_value_notes": item_vals_notes,
                 "weight": weight,
                 "worth": worth,
                 "condition": condition,
-                "aff1": decode_aff1_flags(aff1),
-                "aff2": decode_aff2_flags(aff2),
-                "aff3": decode_aff3_flags(aff3),
-                "aff4": decode_aff4_flags(aff4),
-                "aff5": decode_aff5_flags(aff5),
+                "aff1": decode_flags(aff1, ITEM_AFF1_FLAGS),
+                "aff2": decode_flags(aff2, ITEM_AFF2_FLAGS),
+                "aff3": decode_flags(aff3, ITEM_AFF3_FLAGS),
+                "aff4": decode_flags(aff4, ITEM_AFF4_FLAGS),
+                "aff5": decode_flags(aff5, ITEM_AFF5_FLAGS),
                 "affects": affects,
                 "extra_descriptions": extra_desc,
             }
