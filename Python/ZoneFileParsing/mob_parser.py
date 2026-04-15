@@ -1,7 +1,7 @@
 from typing import Mapping
-from bitvectors import *
-from flags import *
-from spells_skills import *
+from Python.equipment_parser.bitvectors import *
+from Python.equipment_parser.flags import *
+from Python.equipment_parser.spells_skills import *
 
 def parse_mob_file(filename):
     mobs = {}

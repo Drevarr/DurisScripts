@@ -1,4 +1,4 @@
-from bitvectors import *
+from Python.equipment_parser.bitvectors import *
 
 def itemvalue(obj):
     if obj is None:
@@ -179,6 +179,7 @@ def itemvalue(obj):
 
         mod = ((obj["values"][5] / 10.0) if obj["values"][5] > 19 else 1.0) * (30.0 / obj["values"][6])
 
+        #Get spell circles - need a method to do this
         spellcirclesum = get_mincircle(spells[0]) + get_mincircle(spells[1]) + get_mincircle(spells[2])
 
         if obj["values"][4] // 1000000000:  # casts one random spell
@@ -188,9 +189,9 @@ def itemvalue(obj):
         else:  # casts all spells
             workingvalue += mod * spellcirclesum
 
-    # Real object proc
-    if obj_index[obj.R_num].func.obj:
-        workingvalue += get_ival_from_proc(obj_index[obj.R_num].func.obj)
+    # Real object proc - Need to review spec_object assigned
+    #if obj_index[obj.R_num].func.obj:
+        #workingvalue += get_ival_from_proc(obj_index[obj.R_num].func.obj)
 
     # Object affects (A0/A1/A2 etc.)
     for i in range(MAX_OBJ_AFFECT):
