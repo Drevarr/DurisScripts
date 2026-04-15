@@ -1,5 +1,5 @@
 from typing import Mapping
-import typing
+
 
 ACTION_FLAGS = [
     "ACT_SPEC",
@@ -139,7 +139,6 @@ AGGRO3_FLAGS = [
 ]
 
 AFF_FLAGS = [
-    "AFF_NONE"
     "AFF_BLIND",                
     "AFF_INVISIBLE",            
     "AFF_FARSEE",               
@@ -374,7 +373,6 @@ EXTRA2_FLAGS = [
 ]
 
 WEAR_FLAGS = [
-    "ITEM_NONE",            
     "ITEM_TAKE",            
     "ITEM_WEAR_FINGER",     
     "ITEM_WEAR_NECK",       
@@ -490,97 +488,57 @@ TOTEM_SPHERES = [
     "TOTEM_GR_SPIR"         #32    // Greater Spirit
 ]
 
-def BIT(n) -> int:
-    return 1 << (n - 1)
+
+def build_flag_map(names: list[str]) -> dict[str, int]:
+    return {name: 1 << i for i, name in enumerate(names)}
 
 
-TOTEM_SPHERE_FLAGS = [
-    (name, BIT(i + 1))
-    for i, name in enumerate(TOTEM_SPHERES)
-]
-
-ITEM_WEAR_FLAGS = [
-    (name, BIT(i + 1))
-    for i, name in enumerate(WEAR_FLAGS)
-]
-
-ITEM_EXTRA1_FLAGS = [
-    (name, BIT(i + 1))
-    for i, name in enumerate(EXTRA_FLAGS)
-]
-
-ITEM_EXTRA2_FLAGS = [
-    (name, BIT(i + 1))
-    for i, name in enumerate(EXTRA2_FLAGS)
-]
-
-ITEM_CLASS_ANTI_FLAGS = [
-    (name, BIT(i + 1))
-    for i, name in enumerate(CLASS_NAMES)
-]
-
-ITEM_ANTI2_FLAGS = {
-    (name, BIT(i + 1))
-    for i, name in enumerate(RACE_NAMES)
-}
-
-MOB_ACTION_FLAGS = {
-    (name, BIT(i + 1))
-    for i, name in enumerate(ACTION_FLAGS)
-}
-   
-MOB_AGGRO_FLAGS = {
-    (name, BIT(i + 1))
-    for i, name in enumerate(AGGRO_FLAGS)
-}
-
-MOB_AGGRO2_FLAGS = {
-    (name, BIT(i + 1))
-    for i, name in enumerate(AGGRO2_FLAGS)
-}
-
-MOB_AGGRO3_FLAGS = {
-    (name, BIT(i + 1))
-    for i, name in enumerate(AGGRO3_FLAGS)
-}
-
-ITEM_AFF1_FLAGS = {
-    (name, BIT(i + 1))
-    for i, name in enumerate(AFF_FLAGS)
-}
-
-ITEM_AFF2_FLAGS = {
-    (name, BIT(i + 1))
-    for i, name in enumerate(AFF2_FLAGS)
-}
-
-ITEM_AFF3_FLAGS = {
-    (name, BIT(i + 1))
-    for i, name in enumerate(AFF3_FLAGS)
-}
-
-ITEM_AFF4_FLAGS = {
-    (name, BIT(i + 1))
-    for i, name in enumerate(AFF4_FLAGS)
-}
-
-ITEM_AFF5_FLAGS = {
-    (name, BIT(i + 1))
-    for i, name in enumerate(AFF5_FLAGS)
-}
+TOTEM_SPHERE_FLAGS = build_flag_map(TOTEM_SPHERES)
+ITEM_WEAR_FLAGS = build_flag_map(WEAR_FLAGS)
+ITEM_EXTRA1_FLAGS = build_flag_map(EXTRA_FLAGS)
+ITEM_EXTRA2_FLAGS = build_flag_map(EXTRA2_FLAGS)
+ITEM_CLASS_ANTI_FLAGS = build_flag_map(CLASS_NAMES)
+ITEM_ANTI2_FLAGS = build_flag_map(RACE_NAMES)
+MOB_ACTION_FLAGS = build_flag_map(ACTION_FLAGS)
+MOB_AGGRO_FLAGS = build_flag_map(AGGRO_FLAGS)
+MOB_AGGRO2_FLAGS = build_flag_map(AGGRO2_FLAGS)
+MOB_AGGRO3_FLAGS = build_flag_map(AGGRO3_FLAGS)
+ITEM_AFF1_FLAGS = build_flag_map(AFF_FLAGS)
+ITEM_AFF2_FLAGS = build_flag_map(AFF2_FLAGS)
+ITEM_AFF3_FLAGS = build_flag_map(AFF3_FLAGS)
+ITEM_AFF4_FLAGS = build_flag_map(AFF4_FLAGS)
+ITEM_AFF5_FLAGS = build_flag_map(AFF5_FLAGS)
 
 
-def decode_bit_flags(mask: int, table: list[tuple[str, int]]) -> list[str]:
+def decode_flags(mask: int, flag_map: Mapping[str, int], skip_zero: bool = False) -> list[str]:
+    return [
+        name for name, bit in sorted(flag_map.items(), key=lambda x: x[1])
+        if (not skip_zero or bit != 0) and (mask & bit) != 0
+    ]
 
-    return [name for name, bit in table if mask & bit]
+def encode_flags(names: list[str], flag_map: Mapping[str, int]) -> int:
+    mask = 0
+    for name in names:
+        try:
+            mask |= flag_map[name]
+        except KeyError:
+            raise ValueError(f"Unknown flag: {name}") from None
+    return mask
 
-def decode_flags(mask: int, flag_map: dict[str, int], skip_zero: bool = False) -> list[str]:
-    result = []
-
+def get_flag_value(name: str, flag_map: Mapping[str, int]) -> int:
+    try:
+        return flag_map[name]
+    except KeyError:
+        raise ValueError(f"Unknown flag: {name}") from None
+    
+def invert_flag_map(flag_map: Mapping[str, int]) -> dict[int, str]:
+    result = {}
     for name, bit in flag_map.items():
-        if skip_zero and bit == 0:
-            continue
-        if mask & bit:
-            result.append(name)
-
+        if bit in result:
+            raise ValueError(f"Duplicate bit value detected: {bit}")
+        result[bit] = name
     return result
+
+def format_flags(mask: int, flag_map: Mapping[str, int]) -> str:
+    flags = decode_flags(mask, flag_map)
+    return " | ".join(flags) if flags else "NONE"
