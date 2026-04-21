@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Duris Map</title>
+  <title>Duris Map (Corrected)</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -28,42 +28,73 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
+  // --- CONFIG ---
   const imageWidth = 1600;
   const imageHeight = 1600;
+
   const squareSize = 4;
   const mapWidth = 400;
+  const mapHeight = 400;
   const startingVnum = 500000;
 
-  // Use simple CRS (pixel coordinates)
+  // --- INIT MAP ---
   const map = L.map('map', {
     crs: L.CRS.Simple,
     minZoom: -2,
     maxZoom: 4
   });
 
-  // Define image bounds
   const bounds = [[0, 0], [imageHeight, imageWidth]];
-
-  // Add image
-  const image = L.imageOverlay('Duris_Surface_Map1600x1600.wld.png', bounds).addTo(map);
-
+  L.imageOverlay('Duris_Surface_Map1600x1600.wld.png', bounds).addTo(map);
   map.fitBounds(bounds);
 
-  // --- Click handler: pixel -> vnum ---
+  // --- CLICK HANDLER (FIXED Y AXIS) ---
   map.on('click', function(e) {
-    const x = Math.floor(e.latlng.lng);
-    const y = Math.floor(e.latlng.lat);
+    const pixelX = Math.floor(e.latlng.lng);
+    const pixelY = Math.floor(e.latlng.lat);
 
-    const tileX = Math.floor(x / squareSize);
-    const tileY = Math.floor(y / squareSize);
+    const tileX = Math.floor(pixelX / squareSize);
+    const tileY = Math.floor(pixelY / squareSize);
 
-    const vnum = startingVnum + (tileY * mapWidth) + tileX;
+    // Flip Y so bottom-left = starting vnum
+    const flippedY = (mapHeight - 1) - tileY;
+
+    const vnum = startingVnum + (flippedY * mapWidth) + tileX;
 
     L.popup()
       .setLatLng(e.latlng)
-      .setContent(`Pixel: (${x}, ${y})<br>Tile: (${tileX}, ${tileY})<br>VNUM: ${vnum}`)
+      .setContent(
+        `Pixel: (${pixelX}, ${pixelY})<br>` +
+        `Tile: (${tileX}, ${tileY})<br>` +
+        `VNUM: ${vnum}`
+      )
       .openOn(map);
   });
+
+  // --- OPTIONAL: VNUM -> LOCATION HELPER ---
+  function vnumToLatLng(vnum) {
+    const offset = vnum - startingVnum;
+
+    const flippedY = Math.floor(offset / mapWidth);
+    const tileX = offset % mapWidth;
+
+    // unflip Y
+    const tileY = (mapHeight - 1) - flippedY;
+
+    return [
+      tileY * squareSize,
+      tileX * squareSize
+    ];
+  }
+
+  // Example: jump to a vnum (uncomment to test)
+  /*
+  const testVnum = 513141;
+  const latlng = vnumToLatLng(testVnum);
+  L.marker(latlng).addTo(map).bindPopup("VNUM " + testVnum).openPopup();
+  map.setView(latlng, 2);
+  */
+
 </script>
 
 </body>
