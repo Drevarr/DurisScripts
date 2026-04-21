@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Duris Map</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+  const imageWidth = 1600;
+  const imageHeight = 1600;
+  const squareSize = 4;
+  const mapWidth = 400;
+  const startingVnum = 500000;
+
+  // Use simple CRS (pixel coordinates)
+  const map = L.map('map', {
+    crs: L.CRS.Simple,
+    minZoom: -2,
+    maxZoom: 4
+  });
+
+  // Define image bounds
+  const bounds = [[0, 0], [imageHeight, imageWidth]];
+
+  // Add image
+  const image = L.imageOverlay('Duris_Surface_Map1600x1600.wld.png', bounds).addTo(map);
+
+  map.fitBounds(bounds);
+
+  // --- Click handler: pixel -> vnum ---
+  map.on('click', function(e) {
+    const x = Math.floor(e.latlng.lng);
+    const y = Math.floor(e.latlng.lat);
+
+    const tileX = Math.floor(x / squareSize);
+    const tileY = Math.floor(y / squareSize);
+
+    const vnum = startingVnum + (tileY * mapWidth) + tileX;
+
+    L.popup()
+      .setLatLng(e.latlng)
+      .setContent(`Pixel: (${x}, ${y})<br>Tile: (${tileX}, ${tileY})<br>VNUM: ${vnum}`)
+      .openOn(map);
+  });
+</script>
+
+</body>
+</html>
